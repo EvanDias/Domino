@@ -118,7 +118,8 @@ function print_hand1(left, right) {
                     break;
                 } else {
                     if (i === (hand_2.length - 1)) {
-                        go_deck_top();
+                        if(all_tiles.length === 0) deck_empty = 1;
+                        if(deck_empty === 0) go_deck_top(); else {alert("Deck iss empty"); currentPlayer = 1;}
                         i = hand_2.length - 2;
                         size += 1;
                     }
@@ -287,7 +288,8 @@ function StartGame(all_pieces) {
                 break;
             } else {
                 if (i === (hand_2.length - 1)) {
-                    go_deck_top();
+                    if(all_tiles.length === 0) deck_empty = 1;
+                    if(deck_empty === 0) go_deck_top(); else {alert("Deck iss empty"); currentPlayer = 1;}
                     i = hand_2.length - 2;
                     size += 1;
                 }
@@ -413,9 +415,9 @@ function human_play(integer1, integer2) {
 
 
     // ------------
-    if (flag1 === 0 && flag2 === 0 && flag3 === 0) {
-        console.log("BOAS");
-        go_deck_down();
+    if ((flag1 === 0) && (flag2 === 0) && (flag3 === 0) && (deck_empty === 0)) {
+        if(all_tiles.length === 0) deck_empty = 1;
+        if(deck_empty === 0) go_deck_down(); else {alert("Deck is empty"); currentPlayer = 2;}
         currentPlayer = 1;
         return -1;
     }
@@ -460,36 +462,6 @@ function go_deck_top() {
 
 StartGame(initialize_deck());
 
-/*
-
-
-function go_deck_top() {
-    var flag = 0;
-
-    for (i = 0; i < hand_2.length; i++) {
-        verify_left(board, hand_2[i].left, hand_2[i].right);
-        verify_right(board, hand_2[i].left, hand_2[i].right);
-
-        if (aux[0] === 0 && aux[1] === 0 && aux2[0] === 0 && aux2[1] === 0) {
-            continue;
-        } else {
-            flag = 1;
-            break;
-        }
-    }
-
-    if (flag === 0) {
-        var left = all_tiles[0].left, right = all_tiles[0].right;
-        hand_1.push(all_tiles[0]);
-        print_hand2(left,right);
-        all_tiles.splice(0, 1);
-        currentPlayer = 2;
-    } else {
-        currentPlayer = 2;
-    }
-}
-
- */
 
 
 
