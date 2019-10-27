@@ -80,6 +80,7 @@ function first_to_Play(deck) {
 }
 
 var currentPlayer = -1;
+var deck_empty = 0;
 
 // ======================= Print hand Player ======================= //
 function print_hand1(left, right) {
@@ -102,20 +103,27 @@ function print_hand1(left, right) {
             var integer1 = parseInt(str.charAt(0), 10);
             var integer2 = parseInt(str.charAt(1), 10);
 
-           var flag = human_play(integer1, integer2);
+            var human_flag = human_play(integer1, integer2);
         }
+
+        if(human_flag == 0 || human_flag == -2) currentPlayer = 2;
+
         // Time to computer play
-        currentPlayer = 2;
-        if(flag === 1) {
+        if (currentPlayer === 2) {
+            var flag1, size = hand_2.length, i=0;
             for (i = 0; i < hand_2.length; i++) {
                 flag1 = computer_play(hand_2[i].left, hand_2[i].right);
                 if (flag1 === 1) {
+                    currentPlayer = 1;
                     break;
                 } else {
-                    continue;
+                    if (i === (hand_2.length - 1)) {
+                        go_deck_top();
+                        i = hand_2.length - 2;
+                        size += 1;
+                    }
                 }
             }
-            currentPlayer = 1;
         }
 
     });
@@ -123,15 +131,12 @@ function print_hand1(left, right) {
 }
 
 
-function print_hand2(hand) {
-    for (i = 0; i < hand.length; i++) {
-        var left = hand[i].left, right = hand[i].right;
+function print_hand2(left, right) {
         var conta = 50 + 127025 + left * 7 + right; // +50 -> 90º
         var tile = document.createElement("span");
         tile.innerHTML += "&#" + conta + " ";
         //var conta = "127074";
         document.getElementById("top").appendChild(tile);
-    }
 }
 
 // ======================= Print tiles in board ======================= //
@@ -147,9 +152,9 @@ function print_left(hand, left, right, x) {
     board.unshift(p);
 
     if (currentPlayer === 1)
-        if (x === 1) remove_tile_down(hand, left, right); else remove_tile_down(hand, right, left);
+        if (x === 1) remove_tile_down(left, right); else remove_tile_down(right, left);
     if (currentPlayer === 2)
-        if (x === 1) remove_tile_top(hand, left, right); else remove_tile_top(hand, right, left);
+        if (x === 1) remove_tile_top(left, right); else remove_tile_top(right, left);
 }
 
 function print_right(hand, left, right, x) {
@@ -161,31 +166,31 @@ function print_right(hand, left, right, x) {
     var p = new Piece(left, right);
     board.push(p);
     if (currentPlayer === 1)
-        if (x === 1) remove_tile_down(hand, left, right); else remove_tile_down(hand, right, left);
+        if (x === 1) remove_tile_down(left, right); else remove_tile_down(right, left);
     if (currentPlayer === 2)
-        if (x === 1) remove_tile_top(hand, left, right); else remove_tile_top(hand, right, left);
+        if (x === 1) remove_tile_top(left, right); else remove_tile_top(right, left);
 
 }
 
 
 // ========================= Remove tile from hand ========================= //
-function remove_tile_top(hand, left, right) {
-    for (i = 0; i < hand.length; i++) {
-        if (hand[i].left === left && hand[i].right === right) {
+function remove_tile_top(left, right) {
+    for (i = 0; i < hand_2.length; i++) {
+        if ((hand_2[i].left === left ) && (hand_2[i].right === right)) {
             var child = document.getElementById("top");
-            child.removeChild(child.childNodes[i + 1]);
-            hand.splice(i, 1);
+            child.removeChild(child.childNodes[i]);
+            hand_2.splice(i, 1);
             break;
         }
     }
 }
 
-function remove_tile_down(hand, left, right) {
-    for (i = 0; i < hand.length; i++) {
-        if (hand[i].left === left && hand[i].right === right) {
+function remove_tile_down(left, right) {
+    for (i = 0; i < hand_1.length; i++) {
+        if (hand_1[i].left === left && hand_1[i].right === right) {
             var child = document.getElementById("down");
             child.removeChild(child.childNodes[i + 1]);
-            hand.splice(i, 1);
+            hand_1.splice(i, 1);
             break;
         }
     }
@@ -218,10 +223,10 @@ function verify_right(boardd, left, right) {
 var board = [];
 var hand_1 = [];
 var hand_2 = [];
+var all_tiles = new Array(28);
 
 function StartGame(all_pieces) {
     // Shuffle initial deck
-    var all_tiles = new Array(28);
     all_tiles = shuffleDeck(all_pieces);
 
     // Decide who is the first   -> aux[0] = index of tile // aux[1] = player with the biggest tile
@@ -243,11 +248,8 @@ function StartGame(all_pieces) {
         all_tiles.splice(biggestTile, 1);
     }
 
-
-    // Players Deck's
-    var index1, index2;
-
     // conditions to know who have 7 and 6 tiles in the hand
+    var index1, index2;
     if (firstPlayer === 1) index1 = 6; else index1 = 7;
     if (firstPlayer === 2) index2 = 6; else index2 = 7;
 
@@ -262,44 +264,39 @@ function StartGame(all_pieces) {
     // Player 2 Hand
     for (i = 0; i < index2; i++) {
         hand_2[i] = all_tiles[i];
+        print_hand2(hand_2[i].left, hand_2[i].right);
         all_tiles.splice(i, 1);
     }
-    print_hand2(hand_2);
 
 
-    //board.push(middle_tile);
 
     if (firstPlayer === 1) {
-        currentPlayer = 2;
+        currentPlayer = 2; // computer
     } else {
-        currentPlayer = 1;
+        currentPlayer = 1; // human
     }
 
+
     var left = middle_tile.left, right = middle_tile.right;
-    //while (((hand_1.length !== 0 || (hand_2.length !== 0)))) {
-    //for (k = 0; k < 3; k++) {
-    console.log("Hellooo");
-        if (currentPlayer === 2) {
-            var flag1;
-            for (i = 0; i < hand_2.length; i++) {
-                flag1 = computer_play(hand_2[i].left, hand_2[i].right);
-                if (flag1 === 1) {
-                    currentPlayer = 1;
-                    break;
-                } else {
-                    continue;
+    if (currentPlayer === 2) {
+        var flag1, size = hand_2.length, i=0;
+        for (i = 0; i < hand_2.length; i++) {
+            flag1 = computer_play(hand_2[i].left, hand_2[i].right);
+            if (flag1 === 1) {
+                currentPlayer = 1;
+                break;
+            } else {
+                if (i === (hand_2.length - 1)) {
+                    go_deck_top();
+                    i = hand_2.length - 2;
+                    size += 1;
                 }
             }
-
         }
-
-
-    //}
-
-
+    }
 }
 
-
+// ================================================== //
 function computer_play(integer1, integer2) {
     var computer_flag = 0;
     verify_left(board, integer1, integer2);
@@ -363,11 +360,10 @@ function computer_play(integer1, integer2) {
 function human_play(integer1, integer2) {
     verify_left(board, integer1, integer2);
     verify_right(board, integer1, integer2);
-    var flag1 = 0, flag2 = 0, flag3 = 0;
+    var flag1 = 0, flag2 = 0, flag3 = 0, human_flag=0;
 
     // play for both sides
     if ((aux[0] === 1 || aux[1] === 2) && (aux2[0] === 1 || aux2[1] === 2)) {
-        console.log("left and right")
         var random = Math.floor(Math.random() * 2) + 1;
 
         if (random === 1) {
@@ -387,14 +383,12 @@ function human_play(integer1, integer2) {
                 if (aux[1] === 2) print_left(hand_1, integer2, integer1, 2);
             }
         }
-
         flag1 = 1;
-        return flag1;
+        return human_flag;
     }
 
     // just play right
     if ((aux2[0] === 1 || aux2[1] === 2) && (flag1 === 0)) {
-        console.log("right");
         if (integer1 === integer2) { //left == right
             print_right(hand_1, integer1, integer2, 1);
         } else { // left != right
@@ -402,12 +396,11 @@ function human_play(integer1, integer2) {
             if (aux2[1] === 2) print_right(hand_1, integer2, integer1, 2);
         }
         flag2 = 1;
-        return flag2;
+        return human_flag;
     }
 
     // just play left
     if ((aux[0] === 1 || aux[1] === 2) && (flag2 === 0) && (flag1 === 0)) {
-        console.log("left");
         if (integer1 === integer2) { //left == right
             print_left(hand_1, integer1, integer2, 1);
         } else { // left != right
@@ -415,16 +408,88 @@ function human_play(integer1, integer2) {
             if (aux[1] === 2) print_left(hand_1, integer2, integer1, 2);
         }
         flag3 = 1;
-        return flag3;
+        return human_flag;
     }
-    return 0;
+
+
+    // ------------
+    if (flag1 === 0 && flag2 === 0 && flag3 === 0) {
+        console.log("BOAS");
+        go_deck_down();
+        currentPlayer = 1;
+        return -1;
+    }
+
+
+
 }
 
+
+function go_deck_down() {
+    var flag = 0;
+
+    for (i = 0; i < hand_1.length; i++) {
+        verify_left(board, hand_1[i].left, hand_1[i].right);
+        verify_right(board, hand_1[i].left, hand_1[i].right);
+
+        if ((aux[0] === 0) && (aux[1] === 0) && (aux2[0] === 0) && (aux2[1] === 0)) {
+            continue;
+        } else {
+            flag = 1;
+            break;
+        }
+    }
+
+    if (flag === 0) {
+        var left = all_tiles[0].left, right = all_tiles[0].right;
+        hand_1.push(all_tiles[0]);
+        print_hand1(left, right);
+        all_tiles.splice(0, 1);
+    } else {
+        alert("Podes jogar");
+    }
+}
+
+function go_deck_top() {
+    hand_2.push(all_tiles[0]);
+    print_hand2(all_tiles[0].left, all_tiles[0].right);
+    all_tiles.splice(0, 1);
+    currentPlayer = 2;
+}
 
 
 StartGame(initialize_deck());
 
+/*
 
+
+function go_deck_top() {
+    var flag = 0;
+
+    for (i = 0; i < hand_2.length; i++) {
+        verify_left(board, hand_2[i].left, hand_2[i].right);
+        verify_right(board, hand_2[i].left, hand_2[i].right);
+
+        if (aux[0] === 0 && aux[1] === 0 && aux2[0] === 0 && aux2[1] === 0) {
+            continue;
+        } else {
+            flag = 1;
+            break;
+        }
+    }
+
+    if (flag === 0) {
+        var left = all_tiles[0].left, right = all_tiles[0].right;
+        hand_1.push(all_tiles[0]);
+        print_hand2(left,right);
+        all_tiles.splice(0, 1);
+        currentPlayer = 2;
+    } else {
+        currentPlayer = 2;
+    }
+}
+
+ */
 
 
 
