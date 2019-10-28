@@ -82,6 +82,117 @@ function first_to_Play(deck) {
 var currentPlayer = -1;
 var deck_empty = 0;
 
+function verify_tie() {
+    var sum1=0, sum2=0;
+    for(i=0; i<hand_1[i].length; i++) {
+        sum1 += (hand_1[i].left) + (hand_1[i].right);
+    }
+
+    for(i=0; i<hand_2[i].length; i++) {
+        sum2 += hand_1[i].left + hand_1[i].right;
+    }
+
+    if(sum1 > sum2) return 2; else return 1;
+}
+
+
+function easy() {
+    var flag1, size = hand_2.length, i = 0;
+    for (i = 0; i < hand_2.length; i++) {
+        flag1 = computer_play(hand_2[i].left, hand_2[i].right);
+
+        // -----------------------------
+        if (hand_2.length === 0) {
+            alert("Computer win");
+            // botao recomeçar etc...
+            return;
+        }
+        // -----------------------------
+        if (flag1 === 1) {
+            currentPlayer = 1;
+            break;
+        } else {
+            if (i === (hand_2.length - 1)) {
+                if (all_tiles.length === 0) deck_empty = 1;
+                if (deck_empty === 0) draw_tile_top(); else {
+                    alert("Deck iss empty");
+                    currentPlayer = 1;
+                    return;
+                }
+                i = hand_2.length - 2;
+                size += 1;
+            }
+        }
+    }
+
+
+}
+
+function medium() {
+
+    var flag1, index, max = -1, sum, i = 0;
+
+    for (i = 0; i < hand_2.length; i++) {
+        var left = hand_2[i].left, right = hand_2[i].right;
+        flag1 = computer_play_points(left, right);
+
+        if (flag1 === 1) {
+            sum = left + right;
+            if (sum > max) {
+                max = sum;
+                index = i;
+            }
+        }
+    }
+    if (max !== (-1)) {
+        computer_play(hand_2[index].left, hand_2[index].right);
+
+        // -----------------------------
+        if(all_tiles.length === 0) {
+            var x = verify_tie();
+            if(x === 1) alert("You win"); else alert("Computer win");
+            return;
+        }
+
+        if (hand_2.length === 0) {
+            alert("Computer win");
+            // botao recomeçar etc...
+            return;
+        }
+        // -----------------------------
+        currentPlayer = 1;
+        return;
+    }
+
+
+    // if it's necessary take a tile from the deck
+    var j = 0;
+    if (max === (-1)) {
+
+        for (j = 0; j < hand_2.length; j++) {
+            if (all_tiles.length === 0) deck_empty = 1;
+
+            if (deck_empty === 0) {
+                draw_tile_top();
+            } else {
+                alert("Deck iss empty");
+                currentPlayer = 1;
+                return;
+            }
+
+
+            var flag5 = computer_play(hand_2[(hand_2.length) - 1].left, hand_2[(hand_2.length) - 1].right);
+
+            if (flag5 === 1) {
+                currentPlayer = 1;
+                return;
+            } else {
+                j = hand_2.length - 2;
+            }
+        }
+    }
+}
+
 // ======================= Print hand Player ======================= //
 function print_hand1(left, right) {
     var conta = 50 + 127025 + left * 7 + right; // +50 -> 90º
@@ -95,120 +206,39 @@ function print_hand1(left, right) {
     down.addEventListener('click', function () {
 
 
-        if (currentPlayer === 2) {
-            alert("It's not your turn");
-        } else {
-            var str = this.id; // get the id from the clicked tile
+            if (currentPlayer === 2) {
+                alert("It's not your turn");
+            } else {
+                var str = this.id; // get the id from the clicked tile
 
-            // Convert the string ID of the 2D tile to int
-            var integer1 = parseInt(str.charAt(0), 10);
-            var integer2 = parseInt(str.charAt(1), 10);
-            var human_flag = human_play(integer1, integer2);
+                // Convert the string ID of the 2D tile to int
+                var integer1 = parseInt(str.charAt(0), 10);
+                var integer2 = parseInt(str.charAt(1), 10);
+                var human_flag = human_play(integer1, integer2);
 
-            if (hand_1.length === 0) {
-                alert("You win");
-                // botao recomeçar etc...
-                return;
-            }
-        }
-
-        if (human_flag == 0 || human_flag == -2) currentPlayer = 2;
-
-        // Time to computer play RANDOMLY
-        /* if (currentPlayer === 2) {
-             var flag1, size = hand_2.length, i = 0;
-             for (i = 0; i < hand_2.length; i++) {
-                 flag1 = computer_play(hand_2[i].left, hand_2[i].right);
-
-                 // -----------------------------
-                 if (hand_2.length === 0) {
-                     alert("Computer win");
-                     // botao recomeçar etc...
-                     return;
-                 }
-                 // -----------------------------
-                 if (flag1 === 1) {
-                     currentPlayer = 1;
-                     break;
-                 } else {
-                     if (i === (hand_2.length - 1)) {
-                         if (all_tiles.length === 0) deck_empty = 1;
-                         if (deck_empty === 0) draw_tile_top(); else {
-                             alert("Deck iss empty");
-                             currentPlayer = 1;
-                             return;
-                         }
-                         i = hand_2.length - 2;
-                         size += 1;
-                     }
-                 }
-             }
-         }*/
-
-        // Time to computer play with POINTS
-        if (currentPlayer === 2) {
-            var flag1, index, max = -1, sum, i = 0;
-
-            for (i = 0; i < hand_2.length; i++) {
-                var left = hand_2[i].left, right = hand_2[i].right;
-                flag1 = computer_play_points(left, right);
-
-                if (flag1 === 1) {
-                    sum = left + right;
-                    if (sum > max) {
-                        max = sum;
-                        index = i;
-                    }
+                if(all_tiles.length === 0) {
+                    var x = verify_tie();
+                    if(x === 1) alert("You win"); else alert("Computer win");
+                    return;
                 }
-            }
-            if (max !== (-1)) {
-                computer_play(hand_2[index].left, hand_2[index].right);
 
-                // -----------------------------
-                if (hand_2.length === 0) {
-                    alert("Computer win");
+
+                if (hand_1.length === 0) {
+                    alert("You win");
                     // botao recomeçar etc...
                     return;
                 }
-                // -----------------------------
-                currentPlayer = 1;
-                return;
+            }
+
+            if (human_flag === 0 || human_flag === -2) currentPlayer = 2;
+
+            // Time to computer play RANDOMLY
+            if (currentPlayer === 2) {
+                //easy();
+                medium();
             }
 
 
-            // if it's necessary take a tile from the deck
-            var j = 0;
-            if (max === (-1)) {
-
-                for (j = 0; j < hand_2.length; j++) {
-                    if (all_tiles.length === 0) deck_empty = 1;
-
-                    if (deck_empty === 0) {
-                        draw_tile_top();
-                    } else {
-                        alert("Deck iss empty");
-                        currentPlayer = 1;
-                        return;
-                    }
-
-
-                    var flag5 = computer_play(hand_2[(hand_2.length) - 1].left, hand_2[(hand_2.length) - 1].right);
-
-                    if (flag5 === 1) {
-                        currentPlayer = 1;
-                        return;
-                    } else {
-                            j = hand_2.length - 2;
-                        }
-                    }
-
-
-
-
-                }
-
-
-            }
 
 
         }
@@ -388,6 +418,7 @@ function StartGame(all_pieces) {
         }
     }*/
 
+
     // Time to computer play with POINTS
     if (currentPlayer === 2) {
         var flag1, index, max = -1, sum, i = 0;
@@ -488,6 +519,39 @@ function computer_play_points(integer1, integer2) {
 }
 
 
+// ================================================== //
+
+function play_left(integer1, integer2) {
+    if (integer1 === integer2) { //left == right
+        if (aux2[0] === 1) print_left(hand_1, integer1, integer2, 1);
+    } else { // left != right
+        if (aux[0] === 1) print_left(hand_1, integer1, integer2, 1);
+        if (aux[1] === 2) print_left(hand_1, integer2, integer1, 2);
+    }
+    document.getElementById("left").style.display = "none";
+    document.getElementById("right").style.display = "none";
+    currentPlayer = 2;
+    //easy();
+    medium();
+}
+
+function play_right(integer1, integer2) {
+    if (integer1 === integer2) { //left == right
+        if (aux2[0] === 1) print_right(hand_1, integer1, integer2, 1);
+    } else { // left != right
+        if (aux2[0] === 1) print_right(hand_1, integer1, integer2, 1);
+        if (aux2[1] === 2) print_right(hand_1, integer2, integer1, 2);
+    }
+    document.getElementById("left").style.display = "none";
+    document.getElementById("right").style.display = "none";
+    currentPlayer = 2;
+    //easy();
+    medium();
+}
+
+// ================================================== //
+
+
 function human_play(integer1, integer2) {
     verify_left(board, integer1, integer2);
     verify_right(board, integer1, integer2);
@@ -495,27 +559,20 @@ function human_play(integer1, integer2) {
 
     // play for both sides
     if ((aux[0] === 1 || aux[1] === 2) && (aux2[0] === 1 || aux2[1] === 2)) {
-        var random = Math.floor(Math.random() * 2) + 1;
 
-        if (random === 1) {
-            if (integer1 === integer2) { //left == right
-                if (aux2[0] === 1) print_right(hand_1, integer1, integer2, 1);
-            } else { // left != right
-                if (aux2[0] === 1) print_right(hand_1, integer1, integer2, 1);
-                if (aux2[1] === 2) print_right(hand_1, integer2, integer1, 2);
-            }
-        }
+        document.getElementById("left").style.display = "block";
+        document.getElementById("left").onclick = function () {
+            play_left(integer1, integer2);
+        };
+        document.getElementById("right").style.display = "block";
+        document.getElementById("right").onclick = function () {
+            play_right(integer1, integer2);
+        };
 
-        if (random === 2) {
-            if (integer1 === integer2) { //left == right
-                if (aux2[0] === 1) print_left(hand_1, integer1, integer2, 1);
-            } else { // left != right
-                if (aux[0] === 1) print_left(hand_1, integer1, integer2, 1);
-                if (aux[1] === 2) print_left(hand_1, integer2, integer1, 2);
-            }
-        }
+
+        console.log("olaaol");
         flag1 = 1;
-        return human_flag;
+        return 1;
     }
 
     // just play right
