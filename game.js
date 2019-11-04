@@ -83,49 +83,16 @@ var currentPlayer = -1;
 var deck_empty = 0;
 
 function verify_tie() {
-    var sum1=0, sum2=0;
-    for(i=0; i<hand_1[i].length; i++) {
+    var sum1 = 0, sum2 = 0;
+    for (i = 0; i < hand_1[i].length; i++) {
         sum1 += (hand_1[i].left) + (hand_1[i].right);
     }
 
-    for(i=0; i<hand_2[i].length; i++) {
+    for (i = 0; i < hand_2[i].length; i++) {
         sum2 += hand_1[i].left + hand_1[i].right;
     }
 
-    if(sum1 > sum2) return 2; else return 1;
-}
-
-
-function easy() {
-    var flag1, size = hand_2.length, i = 0;
-    for (i = 0; i < hand_2.length; i++) {
-        flag1 = computer_play(hand_2[i].left, hand_2[i].right);
-
-        // -----------------------------
-        if (hand_2.length === 0) {
-            alert("Computer win");
-            // botao recomeçar etc...
-            return;
-        }
-        // -----------------------------
-        if (flag1 === 1) {
-            currentPlayer = 1;
-            break;
-        } else {
-            if (i === (hand_2.length - 1)) {
-                if (all_tiles.length === 0) deck_empty = 1;
-                if (deck_empty === 0) draw_tile_top(); else {
-                    alert("Deck iss empty");
-                    currentPlayer = 1;
-                    return;
-                }
-                i = hand_2.length - 2;
-                size += 1;
-            }
-        }
-    }
-
-
+    if (sum1 > sum2) return 2; else return 1;
 }
 
 function medium() {
@@ -148,15 +115,61 @@ function medium() {
         computer_play(hand_2[index].left, hand_2[index].right);
 
         // -----------------------------
-        if(all_tiles.length === 0) {
-            var x = verify_tie();
-            if(x === 1) alert("You win"); else alert("Computer win");
-            return;
+        if (all_tiles.length === 0) {
+            var tie1 = 0, tie2 = 0;
+            for (z = 0; z < hand_2.length; z++) {
+                verify_right(hand_2[z].left, hand_2[z].right);
+                verify_left(hand_2, hand_2[z].left, hand_2[z].right);
+                if (aux2[0] === 1 || aux2[1] === 2) {
+                    tie2 = 1;
+                    break;
+                }
+            }
+
+            for (y = 0; y < hand_1.length; y++) {
+                verify_right(hand_1[y].left, hand_1[y].right);
+                verify_left(hand_1, hand_1[y].left, hand_1[y].right);
+                if (aux[0] === 1 || aux[1] === 2) {
+                    tie1 = 1;
+                    break;
+                }
+            }
+
+            if (tie1 === 0 && tie2 === 0) {
+                var x = verify_tie();
+                if (x === 1) {
+                    openPlayerWin();
+                    closeGame();
+                    const boardi = document.getElementById("board");
+                    boardi.innerHTML = '';
+                    const down = document.getElementById("down");
+                    down.innerHTML = '';
+                    const top = document.getElementById("top");
+                    top.innerHTML = '';
+                    return;
+                } else {
+                    openComputerWin();
+                    closeGame();
+                    const boardi = document.getElementById("board");
+                    boardi.innerHTML = '';
+                    const down = document.getElementById("down");
+                    down.innerHTML = '';
+                    const top = document.getElementById("top");
+                    top.innerHTML = '';
+                    return;
+                }
+            }
         }
 
         if (hand_2.length === 0) {
-            alert("Computer win");
-            // botao recomeçar etc...
+            openComputerWin();
+            closeGame();
+            const boardi = document.getElementById("board");
+            boardi.innerHTML = '';
+            const down = document.getElementById("down");
+            down.innerHTML = '';
+            const top = document.getElementById("top");
+            top.innerHTML = '';
             return;
         }
         // -----------------------------
@@ -193,6 +206,45 @@ function medium() {
     }
 }
 
+
+function easy() {
+    var flag1, size = hand_2.length, i = 0;
+    for (i = 0; i < hand_2.length; i++) {
+        flag1 = computer_play(hand_2[i].left, hand_2[i].right);
+
+        // -----------------------------
+        if (hand_2.length === 0) {
+            openComputerWin();
+            closeGame();
+            const boardi = document.getElementById("board");
+            boardi.innerHTML = '';
+            const down = document.getElementById("down");
+            down.innerHTML = '';
+            const top = document.getElementById("top");
+            top.innerHTML = '';
+            return;
+        }
+        // -----------------------------
+        if (flag1 === 1) {
+            currentPlayer = 1;
+            break;
+        } else {
+            if (i === (hand_2.length - 1)) {
+                if (all_tiles.length === 0) deck_empty = 1;
+                if (deck_empty === 0) draw_tile_top(); else {
+                    alert("Deck iss empty");
+                    currentPlayer = 1;
+                    return;
+                }
+                i = hand_2.length - 2;
+                size += 1;
+            }
+        }
+    }
+
+
+}
+
 // ======================= Print hand Player ======================= //
 function print_hand1(left, right) {
     var conta = 50 + 127025 + left * 7 + right; // +50 -> 90º
@@ -216,16 +268,59 @@ function print_hand1(left, right) {
                 var integer2 = parseInt(str.charAt(1), 10);
                 var human_flag = human_play(integer1, integer2);
 
-                if(all_tiles.length === 0) {
-                    var x = verify_tie();
-                    if(x === 1) alert("You win"); else alert("Computer win");
-                    return;
+                if (all_tiles.length === 0) {
+                    var tie1 = 0, tie2 = 0;
+                    for (z = 0; z < hand_2.length; z++) {
+                        verify_right(hand_2[z].left, hand_2[z].right);
+                        verify_left(hand_2, hand_2[z].left, hand_2[z].right);
+                        if (aux2[0] === 1 || aux2[1] === 2) {
+                            tie2 = 1;
+                            break;
+                        }
+                    }
+
+                    for (y = 0; y < hand_1.length; y++) {
+                        verify_right(hand_1[y].left, hand_1[y].right);
+                        verify_left(hand_1, hand_1[y].left, hand_1[y].right);
+                        if (aux[0] === 1 || aux[1] === 2) {
+                            tie1 = 1;
+                            break;
+                        }
+                    }
+
+                    if (tie1 === 0 && tie2 === 0) {
+                        var x = verify_tie();
+                        if (x === 1) {
+                            openPlayerWin();
+                            closeGame();
+                            const boardi = document.getElementById("board");
+                            boardi.innerHTML = '';
+                            const down = document.getElementById("down");
+                            down.innerHTML = '';
+                            const top = document.getElementById("top");
+                            top.innerHTML = '';
+                            return;
+                        } else {
+                            openComputerWin();
+                            closeGame();
+                            const boardi = document.getElementById("board");
+                            boardi.innerHTML = '';
+                            const down = document.getElementById("down");
+                            down.innerHTML = '';
+                            const top = document.getElementById("top");
+                            top.innerHTML = '';
+                            return;
+                        }
+                    }
                 }
 
-
                 if (hand_1.length === 0) {
-                    alert("You win");
-                    // botao recomeçar etc...
+                    openPlayerWin();
+                    closeGame();
+                    const boardi = document.getElementById("board");
+                    boardi.innerHTML = '';
+                    const topi = document.getElementById("top");
+                    topi.innerHTML = '';
                     return;
                 }
             }
@@ -234,11 +329,8 @@ function print_hand1(left, right) {
 
             // Time to computer play RANDOMLY
             if (currentPlayer === 2) {
-                //easy();
                 medium();
             }
-
-
 
 
         }
@@ -248,8 +340,8 @@ function print_hand1(left, right) {
 
 
 function print_hand2(left, right) {
-    var conta = 50 + 127025 + left * 7 + right; // +50 -> 90º
-    //var conta = 127074;
+    //var conta = 50 + 127025 + left * 7 + right; // +50 -> 90º
+    var conta = 127074;
     var tile = document.createElement("span");
     tile.innerHTML += "&#" + conta + " ";
     //var conta = "127074";
@@ -346,14 +438,23 @@ var hand_2 = [];
 var all_tiles = new Array(28);
 
 function StartGame(all_pieces) {
+    aux = [];
+    aux2 = [];
+    board = [];
+    hand_1 = [];
+    hand_2 = [];
+    al_tiles = new Array(28);
+    currentPlayer = -1;
+    deck_empty = 0;
+
     // Shuffle initial deck
     all_tiles = shuffleDeck(all_pieces);
 
     // Decide who is the first   -> aux[0] = index of tile // aux[1] = player with the biggest tile
-    var aux = new Array(2);
-    aux = first_to_Play(all_pieces);
+    var aux3 = new Array(2);
+    aux3 = first_to_Play(all_pieces);
 
-    var flag = 0, biggestTile = aux[0], firstPlayer = aux[1];
+    var flag = 0, biggestTile = aux3[0], firstPlayer = aux3[1];
 
     // Initial tile in board
     var middle_tile = new Piece(all_tiles[biggestTile].left, all_tiles[biggestTile].right);
@@ -397,7 +498,8 @@ function StartGame(all_pieces) {
 
 
     var left = middle_tile.left, right = middle_tile.right;
-    /*if (currentPlayer === 2) {
+
+    if (currentPlayer === 2) {
         var flag1, size = hand_2.length, i = 0;
         for (i = 0; i < hand_2.length; i++) {
             flag1 = computer_play(hand_2[i].left, hand_2[i].right);
@@ -416,32 +518,6 @@ function StartGame(all_pieces) {
                 }
             }
         }
-    }*/
-
-
-    // Time to computer play with POINTS
-    if (currentPlayer === 2) {
-        var flag1, index, max = -1, sum, i = 0;
-
-        for (i = 0; i < hand_2.length; i++) {
-            var lefti = hand_2[i].left, righti = hand_2[i].right;
-            flag1 = computer_play_points(lefti, righti);
-
-            if (flag1 === 1) {
-                sum = lefti + righti;
-                if (sum > max) {
-                    max = sum;
-                    index = i;
-                }
-            }
-
-        }
-
-        if (max !== (-1)) {
-            computer_play(hand_2[index].left, hand_2[index].right);
-            currentPlayer = 1;
-        }
-
     }
 }
 
@@ -452,7 +528,7 @@ function computer_play(integer1, integer2) {
     verify_right(board, integer1, integer2);
     var flag1 = 0, flag2 = 0;
 
-    // play for both sides
+// play for both sides
     if ((aux[0] === 1 || aux[1] === 2) && (aux2[0] === 1 || aux2[1] === 2)) {
         console.log("left and right")
         var random = Math.floor(Math.random() * 2) + 1;
@@ -478,7 +554,7 @@ function computer_play(integer1, integer2) {
         flag1 = 1;
     }
 
-    // just play right
+// just play right
     if ((aux2[0] === 1 || aux2[1] === 2) && (flag1 === 0)) {
         console.log("right");
         if (integer1 === integer2) { //left == right
@@ -491,7 +567,7 @@ function computer_play(integer1, integer2) {
         flag2 = 1;
     }
 
-    // just play left
+// just play left
     if ((aux[0] === 1 || aux[1] === 2) && (flag2 === 0) && (flag1 === 0)) {
         console.log("left");
         if (integer1 === integer2) { //left == right
@@ -519,6 +595,67 @@ function computer_play_points(integer1, integer2) {
 }
 
 
+function human_play(integer1, integer2) {
+    verify_left(board, integer1, integer2);
+    verify_right(board, integer1, integer2);
+    var flag1 = 0, flag2 = 0, flag3 = 0, human_flag = 0;
+
+// play for both sides
+    if ((aux[0] === 1 || aux[1] === 2) && (aux2[0] === 1 || aux2[1] === 2)) {
+
+        document.getElementById("left").style.display = "block";
+        document.getElementById("left").onclick = function () {
+            play_left(integer1, integer2);
+        };
+        document.getElementById("right").style.display = "block";
+        document.getElementById("right").onclick = function () {
+            play_right(integer1, integer2);
+        };
+
+
+        flag1 = 1;
+        return 1;
+    }
+
+// just play right
+    if ((aux2[0] === 1 || aux2[1] === 2) && (flag1 === 0)) {
+        if (integer1 === integer2) { //left == right
+            print_right(hand_1, integer1, integer2, 1);
+        } else { // left != right
+            if (aux2[0] === 1) print_right(hand_1, integer1, integer2, 1);
+            if (aux2[1] === 2) print_right(hand_1, integer2, integer1, 2);
+        }
+        flag2 = 1;
+        return human_flag;
+    }
+
+// just play left
+    if ((aux[0] === 1 || aux[1] === 2) && (flag2 === 0) && (flag1 === 0)) {
+        if (integer1 === integer2) { //left == right
+            print_left(hand_1, integer1, integer2, 1);
+        } else { // left != right
+            if (aux[0] === 1) print_left(hand_1, integer1, integer2, 1);
+            if (aux[1] === 2) print_left(hand_1, integer2, integer1, 2);
+        }
+        flag3 = 1;
+        return human_flag;
+    }
+
+
+// ------------
+    if ((flag1 === 0) && (flag2 === 0) && (flag3 === 0) && (deck_empty === 0)) {
+        if (all_tiles.length === 0) deck_empty = 1;
+        if (deck_empty === 0) draw_tile_down(); else {
+            alert("Deck is empty");
+            currentPlayer = 2;
+        }
+        currentPlayer = 1;
+        return -1;
+    }
+
+
+}
+
 // ================================================== //
 
 function play_left(integer1, integer2) {
@@ -531,7 +668,6 @@ function play_left(integer1, integer2) {
     document.getElementById("left").style.display = "none";
     document.getElementById("right").style.display = "none";
     currentPlayer = 2;
-    //easy();
     medium();
 }
 
@@ -545,74 +681,11 @@ function play_right(integer1, integer2) {
     document.getElementById("left").style.display = "none";
     document.getElementById("right").style.display = "none";
     currentPlayer = 2;
-    //easy();
+
     medium();
-}
-
-// ================================================== //
-
-
-function human_play(integer1, integer2) {
-    verify_left(board, integer1, integer2);
-    verify_right(board, integer1, integer2);
-    var flag1 = 0, flag2 = 0, flag3 = 0, human_flag = 0;
-
-    // play for both sides
-    if ((aux[0] === 1 || aux[1] === 2) && (aux2[0] === 1 || aux2[1] === 2)) {
-
-        document.getElementById("left").style.display = "block";
-        document.getElementById("left").onclick = function () {
-            play_left(integer1, integer2);
-        };
-        document.getElementById("right").style.display = "block";
-        document.getElementById("right").onclick = function () {
-            play_right(integer1, integer2);
-        };
-
-
-        console.log("olaaol");
-        flag1 = 1;
-        return 1;
-    }
-
-    // just play right
-    if ((aux2[0] === 1 || aux2[1] === 2) && (flag1 === 0)) {
-        if (integer1 === integer2) { //left == right
-            print_right(hand_1, integer1, integer2, 1);
-        } else { // left != right
-            if (aux2[0] === 1) print_right(hand_1, integer1, integer2, 1);
-            if (aux2[1] === 2) print_right(hand_1, integer2, integer1, 2);
-        }
-        flag2 = 1;
-        return human_flag;
-    }
-
-    // just play left
-    if ((aux[0] === 1 || aux[1] === 2) && (flag2 === 0) && (flag1 === 0)) {
-        if (integer1 === integer2) { //left == right
-            print_left(hand_1, integer1, integer2, 1);
-        } else { // left != right
-            if (aux[0] === 1) print_left(hand_1, integer1, integer2, 1);
-            if (aux[1] === 2) print_left(hand_1, integer2, integer1, 2);
-        }
-        flag3 = 1;
-        return human_flag;
-    }
-
-
-    // ------------
-    if ((flag1 === 0) && (flag2 === 0) && (flag3 === 0) && (deck_empty === 0)) {
-        if (all_tiles.length === 0) deck_empty = 1;
-        if (deck_empty === 0) draw_tile_down(); else {
-            alert("Deck is empty");
-            currentPlayer = 2;
-        }
-        currentPlayer = 1;
-        return -1;
-    }
-
 
 }
+
 
 // ========================== Draw Function ======================== //
 
@@ -648,9 +721,84 @@ function draw_tile_top() {
     currentPlayer = 2;
 }
 
+// ============================================================ //
+function openLoginForm() {
+    document.getElementById("page-mask").style.display = "block";
+    document.getElementById("LoginForm").style.display = "block";
+}
 
-StartGame(initialize_deck());
+function closeLoginForm() {
+    document.getElementById("page-mask").style.display = "none";
+    document.getElementById("LoginForm").style.display = "none";
+}
+
+function openRulesForm() {
+    document.getElementById("page-mask").style.display = "block";
+    document.getElementById("RulesForm").style.display = "block";
+}
+
+function closeRulesForm() {
+    document.getElementById("page-mask").style.display = "none";
+    document.getElementById("RulesForm").style.display = "none";
+}
+
+function openClassification() {
+    document.getElementById("page-mask").style.display = "block";
+    document.getElementById("Classification").style.display = "block";
+}
+
+function closeClassification() {
+    document.getElementById("page-mask").style.display = "none";
+    document.getElementById("Classification").style.display = "none";
+}
+
+function openRegisterForm() {
+    document.getElementById("page-mask").style.display = "block";
+    document.getElementById("registerForm").style.display = "block";
+}
+
+function closeRegisterForm() {
+    document.getElementById("page-mask").style.display = "none";
+    document.getElementById("registerForm").style.display = "none";
+}
 
 
+function closeMainMenu() {
+    document.getElementById("main-menu").style.display = "none";
+}
+
+function openMainMenu() {
+    document.getElementById("main-menu").style.display = "block";
+}
+
+function openComputerWin() {
+    document.getElementById("ComputerWinMenu").style.display = "block";
+}
+
+function closeComputerWin() {
+    document.getElementById("ComputerWinMenu").style.display = "none"
+}
+
+function openPlayerWin() {
+    document.getElementById("PlayerWinMenu").style.display = "block";
+
+}
+
+function closePlayerWin() {
+    document.getElementById("PlayerWinMenu").style.display = "none";
+}
+
+var dificulty;
+
+function openGame() {
+
+
+    StartGame(initialize_deck());
+    document.getElementById("wrapper").style.display = "block";
+}
+
+function closeGame() {
+    document.getElementById("wrapper").style.display = "none";
+}
 
 
