@@ -1,0 +1,4 @@
+ssh up201707418@ssh.alunos.dcc.fc.up.pt -L 8006:vms.alunos.dcc.fc.up.pt:8006 -L 3128:vms:3128
+
+scp game.js index.html style.css up201707418@ssh.alunos.dcc.fc.up.pt:public_html
+
